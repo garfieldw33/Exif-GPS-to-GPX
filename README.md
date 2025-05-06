@@ -4,7 +4,11 @@
 
 ## Image GPS to GPX Converter
 
-This Python tool extracts GPS data from images (JPG, HEIC and others), converts them into GPX tracks, and prepares them for import into the **Fog of World** app.
+This Python tool extracts GPS data from images (JPG, HEIC and others), converts them into GPX tracks, and prepares them for import into the **Fog of World** app. It might be helpful if a user wishes to retrieve their "old" tracks from the albums (i.e. the tracks before they met **Fog of World** etc.).
+
+Sample: Dots retrieved from iCloud album's EXIF ​​and imported into Fog of World
+
+><img src="https://github.com/user-attachments/assets/dc8e491d-0005-46ab-b0e4-f4a0b31a9f3a" width="500" title="importsample" alt="import sample"/>
 
 ## Features
 
