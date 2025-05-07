@@ -9,6 +9,9 @@ from geopy.distance import geodesic
 import argparse
 
 
+def safe_join(*args):
+    return os.path.normpath(os.path.join(*args))
+
 def convert_gps_coordinates(gps_data):
     def dms_to_decimal(degree, minute, second):
         return float(degree + minute / 60 + second / 3600)
@@ -67,7 +70,7 @@ def save_waypoints_to_gpx(directory):
         # Check if file has a supported extension
         if any(filename.lower().endswith(ext) for ext in extensions):
             # Get full file path
-            file_path = os.path.join(directory, filename)
+            file_path = safe_join(directory, filename)
 
             try:
                 # Get GPS data from image
@@ -86,7 +89,7 @@ def save_waypoints_to_gpx(directory):
                 #print(f"No GPS data found in {filename}")
 
     # Save GPX file in the same directory
-    with open(os.path.join(directory, 'waypoints.gpx'), 'w') as file:
+    with open(safe_join(directory, 'waypoints.gpx'), 'w') as file:
         file.write(gpx.to_xml())
 
 def get_exif(filename):
@@ -129,7 +132,7 @@ def save_HEIC_waypoints_to_gpx(directory):
         # Check if file has a supported extension
         if any(filename.lower().endswith(ext) for ext in extensions):
             # Get full file path
-            file_path = os.path.join(directory, filename)
+            file_path = safe_join(directory, filename)
 
             try:
                 # Get GPS data from image
@@ -155,7 +158,7 @@ def save_HEIC_waypoints_to_gpx(directory):
                 #print(f"No GPS data found in {filename}")
 
     # Save GPX file in the same directory
-    with open(os.path.join(directory, 'waypoints_HEIC.gpx'), 'w') as file:
+    with open(safe_join(directory, 'waypoints_HEIC.gpx'), 'w') as file:
         file.write(gpx.to_xml())
 
 def process_directories(root_dir):
@@ -175,7 +178,7 @@ def save_all_waypoints(root_dir, output_dir):
             # If the file is a GPX file
             if filename.endswith('.gpx'):
                 # Open the file
-                with open(os.path.join(dirpath, filename), 'r') as gpx_file:
+                with open(safe_join(dirpath, filename), 'r') as gpx_file:
                     # Parse the file with gpxpy
                     gpx = gpxpy.parse(gpx_file)
                     # Add the waypoints to the list
@@ -189,7 +192,7 @@ def save_all_waypoints(root_dir, output_dir):
         gpx.waypoints.append(waypoint)
 
     # Write the new GPX object to a file in the output directory
-    with open(os.path.join(output_dir, 'all_waypoints.gpx'), 'w') as output_file:
+    with open(safe_join(output_dir, 'all_waypoints.gpx'), 'w') as output_file:
         output_file.write(gpx.to_xml())
 
 
@@ -227,22 +230,28 @@ def delete_waypoints_files(folder_path):
         for file in files:
             # Check if the file name matches the target names
             if file == 'waypoints_HEIC.gpx' or file == 'waypoints.gpx':
-                file_path = os.path.join(root, file)
+                file_path = safe_join(root, file)
                 os.remove(file_path)
                 #print(f"Deleted: {file_path}")
 
-def images_to_tracks(root_dir,output_dir_input=''):
-    if output_dir_input=='':
-        output_dir=os.getcwd()
+def images_to_tracks(root_dir, output_dir_input=''):
+    if output_dir_input == '':
+        output_dir = os.getcwd()
     else:
-        output_dir=output_dir_input
-    
-    process_directories(root_dir) # Generate gpx files for each sub folders under root_dir.
-    save_all_waypoints(root_dir, output_dir) # Gather all waypoints from multiple GPX files (under root_dir) into a single GPX file under output_dir.
-    create_tracks_from_waypoints(output_dir+'/all_waypoints.gpx', output_dir+'/tracks_to_import.gpx') # Convert waypoint in GPX files into tracks.
-    delete_waypoints_files(root_dir) # Remove temporary files
-    os.remove(output_dir+'/all_waypoints.gpx') # Remove temporary files
-    print('GPX tracks saved to: ',output_dir+'/tracks_to_import.gpx.','import it to your Fog of World')
+        output_dir = output_dir_input
+
+    process_directories(root_dir)  # Generate gpx files for each subfolder under root_dir.
+    save_all_waypoints(root_dir, output_dir)  # Gather all waypoints into a single GPX file.
+
+    all_waypoints_path = safe_join(output_dir, 'all_waypoints.gpx')
+    tracks_to_import_path = safe_join(output_dir, 'tracks_to_import.gpx') #use safe_join()
+
+    create_tracks_from_waypoints(all_waypoints_path, tracks_to_import_path)  # Convert waypoints to tracks.
+    delete_waypoints_files(root_dir)  # Remove temporary files
+    os.remove(all_waypoints_path)  # Remove temporary file
+
+    print('GPX tracks saved to:', tracks_to_import_path, '. Import it to your Fog of World')
+
 
 
 if __name__ == "__main__":

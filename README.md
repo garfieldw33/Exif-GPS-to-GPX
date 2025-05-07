@@ -31,6 +31,10 @@ Sample: Dots retrieved from iCloud album's EXIF ​​and imported into Fog of W
    ```bash
    pip install gpxpy GPSPhoto pillow_heif geopy
    ```
+   You might also need these packages (update from @flickxie):
+   ```bash
+   pip install ExifRead piexif
+   ```
 
 ## Usage
 
