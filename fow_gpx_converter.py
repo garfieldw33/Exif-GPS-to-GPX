@@ -10,7 +10,11 @@ import argparse
 
 
 def safe_join(*args):
-    return os.path.normpath(os.path.join(*args))
+    joined = os.path.normpath(os.path.join(*args))
+    # If the first part looks like a Unix-style path, convert all backslashes to slashes
+    if args[0].startswith('/'):
+        joined = joined.replace('\\', '/')
+    return joined
 
 def convert_gps_coordinates(gps_data):
     def dms_to_decimal(degree, minute, second):
